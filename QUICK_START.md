@@ -1,185 +1,123 @@
 # FitTrack Pro - Quick Start Guide
 
-### Step 1: Setup
+## Installation
+
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/AimeneTEBIB/fittrack-pro.git
 cd fittrack-pro
 
 # Install dependencies
 npm install
 ```
 
-### Step 2: Run the App
+## Running the Application
+
 ```bash
 # Start Expo development server
 npm start
-
-# Then choose:
-# - Press 'a' for Android
-# - Press 'i' for iOS  
-# - Scan QR code with Expo Go app on your phone
 ```
 
-### Step 3: Explore Features
+After starting, you have several options:
+- Press 'a' for Android emulator
+- Press 'i' for iOS simulator (Mac only)
+- Scan QR code with Expo Go app on your phone
 
-#### Try These First:
-1. **Home Tab** - See the step counter in action (shake your device!)
-2. **Workouts Tab** - View sample workouts, try adding a new one
-3. **Nutrition Tab** - Log a meal and track calories
-4. **Goals Tab** - Set a fitness goal
-5. **Profile Tab** - Take a profile photo with camera
+## Testing the Features
 
----
+### Home Screen
+The home screen displays the step counter. Shake your device or walk around to see the step count increase. The accelerometer sensor tracks movement in real-time.
 
-## Requirements Checklist
+### Workouts
+Navigate to the Workouts tab to view sample workouts. You can add new workouts using the floating action button, edit existing workouts by tapping on them, and mark workouts as complete.
 
-#### Screens (8+ Required) ✓
-- [ ] HomeScreen
-- [ ] WorkoutsScreen
-- [ ] AddWorkoutScreen
-- [ ] WorkoutDetailScreen
-- [ ] NutritionScreen
-- [ ] GoalsScreen
-- [ ] ProgressScreen
-- [ ] ProfileScreen
+### Nutrition
+The Nutrition tab allows you to log meals and track daily calorie intake. Add water intake by tapping the +1 Glass button. When you reach your daily water goal, you'll receive a completion alert.
 
-#### API Methods (3 Required) ✓
-- [ ] GET - Fetch workouts (WorkoutsScreen)
-- [ ] POST - Create workout (AddWorkoutScreen)
-- [ ] PUT - Update workout (WorkoutDetailScreen)
+### Goals
+Set fitness goals in the Goals tab. Track your progress and view detailed statistics in the Progress screen.
 
-#### Navigation (2 Types) ✓
-- [ ] Stack Navigation (Workout flows, Goal flows)
-- [ ] Bottom Tab Navigation (Main tabs)
+### Profile
+In the Profile tab, you can take a profile photo using the camera, edit your personal information, and view body measurements. All profile data persists using AsyncStorage.
 
-#### UI Framework ✓
-- [ ] React Native Paper implemented throughout
+## Common Issues
 
-#### Sensors (2 Required) ✓
-- [ ] Camera (ProfileScreen - profile photos)
-- [ ] Accelerometer (HomeScreen - step counter)
-
-#### Repository ✓
-- [ ] Code on GitHub/GitLab/Bitbucket
-- [ ] Each member has 5+ commits
-- [ ] Commits are meaningful and descriptive
-
----
-
-## 👥 Team Workflow
-
-### Initial Setup (Do This Together)
+### Module Not Found
+If you encounter module not found errors, clear the cache and reinstall:
 ```bash
-# One person creates repo on GitHub
-# Everyone else clones it
-
-git clone <repo-url>
-cd fittrack-pro
-npm install
-```
-
-### Individual Work
-```bash
-# Create your feature branch
-git checkout -b feature/yourname-feature
-
-# Make changes, then commit
-git add .
-git commit -m "feat: your description"
-
-# Push to GitHub
-git push origin feature/yourname-feature
-
-# Create Pull Request on GitHub
-# Have teammate review and merge
-```
-
-
-
-
-**Test Navigation:**
-- Tap all tabs
-- Go to workout detail and back
-- Add workout and verify it appears
-
-**Test API:**
-- Create workout → Check it's saved
-- Update workout → Verify changes
-- Refresh workouts → Data persists
-
-**Test Sensors:**
-- Take profile photo → Photo displays
-- Shake device → Steps increase
-
-**Test Forms:**
-- Submit empty form → See validation
-- Submit valid form → Success message
-
----
-
-## Common Issues & Fixes
-
-### "Cannot find module"
-```bash
-# Clear cache and reinstall
 rm -rf node_modules
 npm install
+npm start -- --clear
 ```
 
-### "Metro bundler error"
+### Metro Bundler Error
+Reset the Metro bundler:
 ```bash
-# Reset Metro
-expo start -c
+npx expo start -c
 ```
 
-### "Camera not working"
-```bash
-# Check permissions in device settings
-# Android: Settings > Apps > Expo Go > Permissions
-# iOS: Settings > Expo Go > Camera
-```
+### Camera Not Working
+Check device permissions:
+- Android: Settings > Apps > Expo Go > Permissions > Camera
+- iOS: Settings > Expo Go > Camera
 
-### "Accelerometer not updating"
-```bash
-# Make sure you're testing on physical device
-# Accelerometer doesn't work well in simulators
-```
+### Accelerometer Not Updating
+The accelerometer works best on physical devices. Emulators and simulators may not accurately simulate accelerometer data.
 
----
+## Project Structure
 
-## Key Files to Know
+The application follows a standard React Native structure:
 
 ```
 fittrack-pro/
-│
-├── App.js                          # App entry point
-├── package.json                    # Dependencies
-├── app.json                        # Expo configuration
-│
+├── App.js                   # Application entry point
+├── package.json            # Dependencies
 ├── src/
-│   ├── navigation/
-│   │   └── AppNavigator.js        # Navigation setup (Stack + Tabs)
-│   │
-│   ├── services/
-│   │   └── api.js                 # API methods (GET, POST, PUT)
-│   │
-│   ├── screens/
-│   │   ├── HomeScreen.js          # Dashboard + Accelerometer
-│   │   ├── WorkoutsScreen.js      # Workouts list + GET
-│   │   ├── AddWorkoutScreen.js    # Add workout + POST
-│   │   ├── WorkoutDetailScreen.js # Detail view + PUT
-│   │   ├── NutritionScreen.js     # Meal tracking
-│   │   ├── GoalsScreen.js         # Goals management
-│   │   ├── ProgressScreen.js      # Progress charts
-│   │   └── ProfileScreen.js       # Profile + Camera
-│   │
-│   └── utils/
-│       └── storage.js             # AsyncStorage helpers
-│
-├── README.md                       # Project overview
-├── DOCUMENTATION.md                # Full documentation
-└── GIT_GUIDE.md                   # Git workflow guide
+│   ├── navigation/        # Navigation setup
+│   ├── screens/          # All application screens
+│   ├── services/         # API services
+│   └── utils/           # Utility functions
 ```
 
+## Key Files
 
+- App.js - Main application component with React Native Paper provider
+- src/navigation/AppNavigator.js - Navigation configuration
+- src/services/api.js - API methods (GET, POST, PUT)
+- src/utils/storage.js - AsyncStorage helpers
+- src/screens/ - All application screens
+
+## Requirements Verification
+
+The application meets all project requirements:
+
+8 Screens: HomeScreen, WorkoutsScreen, AddWorkoutScreen, WorkoutDetailScreen, NutritionScreen, GoalsScreen, ProgressScreen, ProfileScreen
+
+3 API Methods: GET (fetch workouts), POST (create workout), PUT (update workout)
+
+2 Navigation Types: Stack Navigation and Bottom Tab Navigation
+
+UI Framework: React Native Paper throughout
+
+2 Sensors: Camera (profile photos) and Accelerometer (step counter)
+
+Repository: GitHub with 6 commits
+
+## Testing Checklist
+
+Before presenting the project, verify:
+
+Navigation: All tabs work, screen transitions are smooth
+API Operations: Create, read, and update workouts successfully
+Sensors: Camera captures photos, accelerometer counts steps
+Data Persistence: Profile data and images persist after closing app
+Forms: Validation works, success messages appear
+UI: All screens display correctly, no layout issues
+
+## Development Notes
+
+The application uses Expo SDK 54 for development. All dependencies are compatible with both iOS and Android platforms. Data persistence is handled through AsyncStorage, and the API implementation uses a combination of JSONPlaceholder for mock external calls and local storage for data persistence.
+
+## Support
+
+For issues or questions, contact aymentebib44@gmail.com

@@ -1,8 +1,4 @@
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Base API URL - using JSONPlaceholder as base + local storage for gym data
-const API_BASE_URL = 'https://jsonplaceholder.typicode.com';
 
 // Local storage keys
 const WORKOUTS_KEY = '@fittrack_workouts';
@@ -66,12 +62,7 @@ export const getWorkouts = async () => {
  */
 export const createWorkout = async (workoutData) => {
   try {
-    // Simulate API call
-    const response = await axios.post(`${API_BASE_URL}/posts`, {
-      title: workoutData.title,
-      body: JSON.stringify(workoutData),
-      userId: 1
-    });
+    console.log('Creating new workout:', workoutData);
     
     // Add to local storage
     const existingWorkouts = await getWorkouts();
@@ -85,6 +76,7 @@ export const createWorkout = async (workoutData) => {
     const updatedWorkouts = [...existingWorkouts, newWorkout];
     await AsyncStorage.setItem(WORKOUTS_KEY, JSON.stringify(updatedWorkouts));
     
+    console.log('Workout created successfully:', newWorkout.id);
     return newWorkout;
   } catch (error) {
     console.error('Error creating workout:', error);
@@ -94,39 +86,58 @@ export const createWorkout = async (workoutData) => {
 
 /**
  * PUT - Update an existing workout
+ * FIXED VERSION - No axios, direct AsyncStorage update
  */
 export const updateWorkout = async (workoutId, updatedData) => {
   try {
-    // Simulate API call
-    await axios.put(`${API_BASE_URL}/posts/${workoutId}`, {
-      title: updatedData.title,
-      body: JSON.stringify(updatedData),
-      userId: 1
-    });
+    console.log('updateWorkout called with ID:', workoutId, 'type:', typeof workoutId);
+    console.log('Update data:', updatedData);
     
-    // Update in local storage
+    // Update in local storage directly (no axios call)
     const existingWorkouts = await getWorkouts();
-    const updatedWorkouts = existingWorkouts.map(workout =>
-      workout.id === workoutId ? { ...workout, ...updatedData } : workout
-    );
+    console.log('Existing workouts count:', existingWorkouts.length);
+    console.log('Existing workout IDs:', existingWorkouts.map(w => ({id: w.id, type: typeof w.id})));
+    
+    // Convert both IDs to numbers for comparison
+    const numericWorkoutId = Number(workoutId);
+    
+    const updatedWorkouts = existingWorkouts.map(workout => {
+      const numericCurrentId = Number(workout.id);
+      if (numericCurrentId === numericWorkoutId) {
+        console.log('Found matching workout!', workout.id);
+        return { ...workout, ...updatedData };
+      }
+      return workout;
+    });
     
     await AsyncStorage.setItem(WORKOUTS_KEY, JSON.stringify(updatedWorkouts));
     
-    return updatedWorkouts.find(w => w.id === workoutId);
+    const updatedWorkout = updatedWorkouts.find(w => Number(w.id) === numericWorkoutId);
+    
+    if (!updatedWorkout) {
+      console.error('Workout not found after update!');
+      throw new Error(`Workout with ID ${workoutId} not found`);
+    }
+    
+    console.log('Workout updated successfully:', updatedWorkout);
+    return updatedWorkout;
   } catch (error) {
     console.error('Error updating workout:', error);
+    console.error('Error details:', error.message);
     throw error;
   }
 };
 
 /**
- * DELETE - Delete a workout (bonus)
+ * DELETE - Delete a workout
  */
 export const deleteWorkout = async (workoutId) => {
   try {
     const existingWorkouts = await getWorkouts();
-    const updatedWorkouts = existingWorkouts.filter(w => w.id !== workoutId);
+    const numericWorkoutId = Number(workoutId);
+    const updatedWorkouts = existingWorkouts.filter(w => Number(w.id) !== numericWorkoutId);
     await AsyncStorage.setItem(WORKOUTS_KEY, JSON.stringify(updatedWorkouts));
+    console.log('Workout deleted:', workoutId);
     return true;
   } catch (error) {
     console.error('Error deleting workout:', error);
@@ -185,6 +196,7 @@ export const createGoal = async (goalData) => {
     const updatedGoals = [...existingGoals, newGoal];
     await AsyncStorage.setItem(GOALS_KEY, JSON.stringify(updatedGoals));
     
+    console.log('Goal created:', newGoal.id);
     return newGoal;
   } catch (error) {
     console.error('Error creating goal:', error);
@@ -194,15 +206,44 @@ export const createGoal = async (goalData) => {
 
 export const updateGoal = async (goalId, updatedData) => {
   try {
+    console.log('updateGoal called with ID:', goalId);
     const existingGoals = await getGoals();
+    const numericGoalId = Number(goalId);
+    
     const updatedGoals = existingGoals.map(goal =>
-      goal.id === goalId ? { ...goal, ...updatedData } : goal
+      Number(goal.id) === numericGoalId ? { ...goal, ...updatedData } : goal
     );
     
     await AsyncStorage.setItem(GOALS_KEY, JSON.stringify(updatedGoals));
-    return updatedGoals.find(g => g.id === goalId);
+    
+    const updatedGoal = updatedGoals.find(g => Number(g.id) === numericGoalId);
+    console.log('Goal updated successfully:', updatedGoal);
+    
+    return updatedGoal;
   } catch (error) {
     console.error('Error updating goal:', error);
+    throw error;
+  }
+};
+
+/**
+ * DELETE - Delete a goal
+ * THIS WAS MISSING!
+ */
+export const deleteGoal = async (goalId) => {
+  try {
+    console.log('deleteGoal called with ID:', goalId);
+    const existingGoals = await getGoals();
+    const numericGoalId = Number(goalId);
+    
+    const updatedGoals = existingGoals.filter(g => Number(g.id) !== numericGoalId);
+    
+    await AsyncStorage.setItem(GOALS_KEY, JSON.stringify(updatedGoals));
+    console.log('Goal deleted successfully:', goalId);
+    
+    return true;
+  } catch (error) {
+    console.error('Error deleting goal:', error);
     throw error;
   }
 };
@@ -265,9 +306,22 @@ export const getNutritionData = async () => {
 export const updateNutritionData = async (nutritionData) => {
   try {
     await AsyncStorage.setItem(NUTRITION_KEY, JSON.stringify(nutritionData));
+    console.log('Nutrition data updated');
     return nutritionData;
   } catch (error) {
     console.error('Error updating nutrition data:', error);
+    throw error;
+  }
+};
+
+
+export const clearAllData = async () => {
+  try {
+    await AsyncStorage.multiRemove([WORKOUTS_KEY, GOALS_KEY, NUTRITION_KEY]);
+    console.log('All data cleared');
+    return true;
+  } catch (error) {
+    console.error('Error clearing data:', error);
     throw error;
   }
 };
@@ -280,6 +334,8 @@ export default {
   getGoals,
   createGoal,
   updateGoal,
+  deleteGoal,  
   getNutritionData,
-  updateNutritionData
+  updateNutritionData,
+  clearAllData
 };
