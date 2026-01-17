@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { 
   Card, 
   Title, 
@@ -41,19 +41,73 @@ export default function NutritionScreen() {
   };
 
   const handleAddWater = async () => {
-    if (!nutritionData) return;
+  if (!nutritionData) return;
 
+  const currentWater = nutritionData.today.water;
+  const goalWater = nutritionData.today.goal.water;
+
+  // Check if goal is reached
+  if (currentWater >= goalWater) {
+    Alert.alert(
+      '🎉 Water Goal Reached!',
+      `Congratulations! You've reached your daily water goal of ${goalWater} glasses.`,
+      [
+        {
+          text: 'Reset to 0',
+          onPress: async () => {
+            const updatedData = {
+              ...nutritionData,
+              today: {
+                ...nutritionData.today,
+                water: 0
+              }
+            };
+            await updateNutritionData(updatedData);
+            setNutritionData(updatedData);
+          }
+        },
+        {
+          text: 'Continue Adding',
+          onPress: async () => {
+            const updatedData = {
+              ...nutritionData,
+              today: {
+                ...nutritionData.today,
+                water: currentWater + 1
+              }
+            };
+            await updateNutritionData(updatedData);
+            setNutritionData(updatedData);
+          }
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        }
+      ]
+    );
+  } else {
+    // Normal add water
     const updatedData = {
       ...nutritionData,
       today: {
         ...nutritionData.today,
-        water: nutritionData.today.water + 1
+        water: currentWater + 1
       }
     };
 
     await updateNutritionData(updatedData);
     setNutritionData(updatedData);
-  };
+
+    // Show encouragement when close to goal
+    if (currentWater + 1 === goalWater) {
+      Alert.alert(
+        '🎉 Great Job!',
+        `You've reached your water goal for today! Keep up the good work!`
+      );
+    }
+  }
+};
 
   const handleAddMeal = async () => {
     if (!newMeal.name || !newMeal.calories) return;

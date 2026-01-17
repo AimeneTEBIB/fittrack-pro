@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { 
   Card, 
@@ -15,6 +15,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import { storeData, getData } from '../utils/storage';
 
 export default function ProfileScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -30,13 +31,40 @@ export default function ProfileScreen() {
     goal: 'Build Muscle and lose fat'
   });
 
+  // Load saved data when component mounts
+  useEffect(() => {
+    loadSavedData();
+  }, []);
+
+  const loadSavedData = async () => {
+    try {
+      // Load profile image
+      const savedImage = await getData('profileImage');
+      if (savedImage) {
+        setProfileImage(savedImage);
+      }
+      
+      // Load user profile data
+      const savedProfile = await getData('userProfile');
+      if (savedProfile) {
+        setUserProfile(savedProfile);
+      }
+    } catch (error) {
+      console.error('Error loading saved data:', error);
+    }
+  };
+
   const takePhoto = async () => {
     if (cameraRef && permission?.granted) {
       try {
         const photo = await cameraRef.takePictureAsync();
         setProfileImage(photo.uri);
+        
+        // Save to AsyncStorage
+        await storeData('profileImage', photo.uri);
+        
         setShowCamera(false);
-        Alert.alert('Success', 'Profile photo updated!');
+        Alert.alert('Success', 'Profile photo updated and saved!');
       } catch (error) {
         console.error('Error taking photo:', error);
         Alert.alert('Error', 'Failed to take photo');
@@ -55,7 +83,11 @@ export default function ProfileScreen() {
 
       if (!result.canceled) {
         setProfileImage(result.assets[0].uri);
-        Alert.alert('Success', 'Profile photo updated!');
+        
+        // Save to AsyncStorage
+        await storeData('profileImage', result.assets[0].uri);
+        
+        Alert.alert('Success', 'Profile photo updated and saved!');
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -96,9 +128,17 @@ export default function ProfileScreen() {
     );
   };
 
-  const handleSaveProfile = () => {
-    setEditModalVisible(false);
-    Alert.alert('Success', 'Profile updated successfully!');
+  const handleSaveProfile = async () => {
+    try {
+      // Save user profile to AsyncStorage
+      await storeData('userProfile', userProfile);
+      
+      setEditModalVisible(false);
+      Alert.alert('Success', 'Profile updated and saved successfully!');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      Alert.alert('Error', 'Failed to save profile');
+    }
   };
 
   if (showCamera) {
