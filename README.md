@@ -121,10 +121,10 @@ API Methods:
 
 ## Development Timeline
 
-### Commit 1 - December 18, 2024
+### Commit 1 - December 18, 2025
 Initial project setup including React Native configuration, Expo setup, and dependency installation. Configured package.json, babel.config.js, and .gitignore files.
 
-### Commit 2 - December 28, 2024
+### Commit 2 - December 28, 2025
 Created the main App component and integrated React Native Paper provider. Established the foundation for the application theme and styling system.
 
 ### Commit 3 - January 2, 2026
